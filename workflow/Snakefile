@@ -1,0 +1,92 @@
+# Main entrypoint of the workflow. 
+# Please follow the best practices: 
+# https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
+# in particular regarding the standardized folder structure mentioned there. 
+
+configfile: "config/config.yaml"
+
+Ls = config["L"]
+z0s = config["z0"]
+v0s = config["v0"]
+Ns = config["N"]
+y0s = config["y0"]
+betas = config["beta"]
+numGens = config["numGen"]
+
+sim_results_pattern = "sim_L{L}_z0{z0}_v0{v0}_N{N}_y0{y0}_beta{beta}_numGen{numGen}"
+
+sim_results_block_number = expand("data/"+sim_results_pattern+ "_block_number.png", 
+                                  L=Ls, z0=z0s, v0=v0s,
+                                  N=Ns, y0=y0s, beta=betas, numGen=numGens)
+
+sim_results_block_length = expand("data/"+sim_results_pattern+ "_block_length.png", 
+                                  L=Ls, z0=z0s, v0=v0s,
+                                  N=Ns, y0=y0s, beta=betas, numGen=numGens)
+
+sim_results_total_length = expand("data/"+sim_results_pattern+ "_total_length.png", 
+                                  L=Ls, z0=z0s, v0=v0s,
+                                  N=Ns, y0=y0s, beta=betas, numGen=numGens)
+
+sim_results_trait = expand("data/"+sim_results_pattern+ "_average_trait.png", 
+                          L=Ls, z0=z0s, v0=v0s,
+                          N=Ns, y0=y0s, beta=betas, numGen=numGens)
+
+
+
+rule all:
+  input:
+    sim_results_block_number,
+    sim_results_block_length,
+    sim_results_total_length,
+    sim_results_trait,
+
+rule sim_slim:
+  input:
+  output:
+    "data/tmp/"+sim_results_pattern + ".trees"
+  conda:
+    "envs/slim.yaml"
+  shell:
+    ("slim -d L={wildcards.L} -d z0={wildcards.z0} -d v0={wildcards.v0} "+
+    "-d N={wildcards.N} -d y0={wildcards.y0} "+
+    "-d beta={wildcards.beta} -d numGen={wildcards.numGen} workflow/scripts/sim_introgression.slim")
+
+rule process_tree:
+  input:
+    "data/tmp/"+sim_results_pattern + ".trees"
+  output:
+    "data/tmp/"+sim_results_pattern + "_ibd_segment.csv"
+  conda:
+    "envs/tskit.yaml"
+  script:
+    "scripts/process_tree.py"
+
+rule block_number:
+  input:
+    tree = "data/tmp/"+sim_results_pattern + ".trees",
+    ibd_df = "data/tmp/"+sim_results_pattern + "_ibd_segment.csv"
+  output:
+    block_number = "data/"+sim_results_pattern + "_block_number.png",
+    block_length = "data/"+sim_results_pattern + "_block_length.png",
+    total_length = "data/"+sim_results_pattern + "_total_length.png",
+  params:
+    N = lambda wildcards: wildcards.N
+  conda:
+    "envs/tskit.yaml"
+  script:
+    "scripts/plot_block.py"
+
+rule trait:
+    input:
+      "data/tmp/"+sim_results_pattern + ".trees"
+    output:
+      "data/"+sim_results_pattern + "_average_trait.png"
+    params:
+      N = lambda wildcards: wildcards.N
+    conda:
+      "envs/tskit.yaml"
+    script:
+      "scripts/plot_trait.py"
+
+
+    

@@ -1,0 +1,65 @@
+// set up a simple neutral simulation
+initialize() {
+	initializeTreeSeq();
+	initializeMutationRate(0.0);
+	
+	// m1 mutation type: postively selected
+	if (!exists("L")) defineConstant("L", 1000); // Length of chromosome
+	if (!exists("z0")) defineConstant("z0", 0);	// Trait value
+	if (!exists("v0")) defineConstant("v0", 1); // Parameter for variance
+	if (!exists("N")) defineConstant("N", 1000); // Number of individuals per generation
+	if (!exists("y0")) defineConstant("y0", 0.1); // Recombination rate per site
+	if (!exists("beta")) defineConstant("beta", 1); // Beta constant for selection
+	if (!exists("numGen")) defineConstant("numGen", 10); // Number of generations
+	
+	// m1 distribution won't matter, as we are manually selecting
+	// the selection coefficient
+	// Dominance coefficient h makes the fitness effect as 1+hs
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	
+	// g1 genomic element type: uses m1 for all mutations
+	initializeGenomicElementType("g1", m1, 1.0);
+	m1.convertToSubstitution = F;
+	
+	// Color just for SLiM gui
+	m1.color = "red";
+	
+	initializeGenomicElement(g1, 0, L);
+	initializeRecombinationRate(y0);
+	
+	// File name for saving tree sequence data
+	base_filename = ("data/tmp/sim_"+
+		"L"+L+"_z0"+z0+"_v0"+v0+
+		"_N"+N+"_y0"+y0+"_beta"+beta+"_numGen"+numGen+".trees"
+		);
+	defineConstant("filename", base_filename);
+
+}
+// Set mutation effect of m1 as 1 (neutral), because we want
+// to manually determine the selection
+mutationEffect(m1) { return 1.0; }
+
+1 early() {
+	// create a population of N individuals
+	sim.addSubpop("p1", N);
+	// add mutations to a single genome
+	genome = p1.individuals[0].genome1;
+	for (k in seqLen(L)) {
+		sd = sqrt(v0*y0/L);
+		S = rnorm(n=1, mean=z0/L, sd=sd);
+		genome.addNewMutation(m1, selectionCoeff=S, position=k);
+	}
+}
+
+1: late() {
+	inds = p1.individuals;
+	phenotypes = inds.sumOfMutationsOfType(m1);
+	inds.fitnessScaling = exp(beta * phenotypes);
+	focal = (inds.countOfMutationsOfType(m1) > 0);
+	sim.treeSeqRememberIndividuals(inds[focal]);
+}
+
+// Record for 100 generations
+numGen late() {
+	sim.treeSeqOutput(filename);
+}

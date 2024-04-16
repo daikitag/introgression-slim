@@ -1,0 +1,14 @@
+# Length of chromosome
+L: 128
+# Trait value
+z0: 1
+# Parameter for variance
+v0: 1
+# Number of individuals per generation
+N: 1000
+# Recombination rate per site
+y0: 0.25
+# Beta constant for selection
+beta: 0.1
+# Number of generations for simulation
+numGen: 500
