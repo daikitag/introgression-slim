@@ -41,7 +41,7 @@ The mathematical details of the simulation model is described in [Sachdeva and B
 
 - Discrete Wright-Fisher model
 - Fitness is defined in the "Individual-based simulations of long-term introgression into a finite population" section
-- Effect sizes of each mutation are sampled from $N(z/L, \sqrt{vy/L})$, where $z$ is the initial trait value, $L$ is the length of the chromosome, and $v$ is genetic variance per unit map length. While the initial trait value will not be exactly $z$, users can set the chromosome length as any integer
+- Effect sizes of each mutation are sampled from $N(z/L, \sqrt{vy/L})$, where $z$ is the initial trait value, $L$ is the length of the chromosome, and $v$ is genetic variance per unit map length. While the initial trait value will not be exactly $z$, users can set the chromosome length as any integer in this setting.
 - Recombination rate is set as rate/site, instead of rate/individual in [Sachdeva and Barton (2018)](https://doi.org/10.1534/genetics.118.301018). It would be possible for the simulation to have multiple recombination breakpoints.
 - Discrete loci (Recombination breakpoints will be an integer)
 - Zero mutation rate, and all mutations descend from the single individual at the first generation
