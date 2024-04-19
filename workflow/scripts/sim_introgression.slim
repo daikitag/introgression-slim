@@ -13,12 +13,7 @@ initialize() {
 	initializeGenomicElementType("g1", m1, 1.0);
 	m1.convertToSubstitution = F;
 	
-	// Color just for SLiM gui
-	m1.color = "red";
-	
 	initializeGenomicElement(g1, 0, L);
-	// Recombination will be set by using recombination()
-	// to model single crossover
 	initializeRecombinationRate(y);
 
 }
@@ -46,7 +41,7 @@ mutationEffect(m1) { return 1.0; }
 	sim.treeSeqRememberIndividuals(inds[focal]);
 }
 
-// Record for 100 generations
+// Record for numGen generations
 numGen late() {
 	sim.treeSeqOutput(filename);
 }
