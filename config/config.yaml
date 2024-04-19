@@ -1,5 +1,5 @@
 # Length of chromosome
-L: 128
+L: 1000
 # Initial trait value
 z: 1
 # Genic variance per unit map length
