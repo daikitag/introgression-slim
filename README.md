@@ -4,6 +4,8 @@ This repository conducts the introgression model simulation described in [Sachde
 
 The parameters of the simulation model can be set by manipulating the parameters in `config.yaml` file inside `config` directory, and the details of the parameters are written in `README.md` file in the directory. See the `Mathematical model` section below for details of the simulation.
 
+## Usage:
+
 1. Clone this repo
 
 ```
@@ -15,6 +17,7 @@ $ git clone https://github.com/daikitag/introgression-slim.git
 ```
 $ conda install -c bioconda snakemake
 ```
+You do not have to install other packages like `SLiM` and `tskit`, as `snakemake` will automatically install them for you when you run the command.
 
 3. Run the simulation command by
 
