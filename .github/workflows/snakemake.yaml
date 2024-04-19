@@ -1,0 +1,19 @@
+name: Snakemake
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches_ignore: []
+
+jobs:
+  run-workflow:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Test workflow (basic model)
+      uses: snakemake/snakemake-github-action@v1.22.0
+      with:
+        directory: .test
+        snakefile: workflow/Snakefile
+        args: "--configfile .test/config_basic/config.yaml --use-conda --show-failed-logs --cores 1 --conda-cleanup-pkgs cache"

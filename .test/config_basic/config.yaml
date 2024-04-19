@@ -1,0 +1,18 @@
+# Length of chromosome
+L: 1000
+# Initial trait value
+z: 1
+# Genic variance per unit map length
+v: 1
+# Number of individuals per generation
+N: 1000
+# Recombination rate per site
+y: 1e-8
+# Selection gradient
+beta: 0.1
+# Number of generations in the simulation
+numGen: 10
+# Number of replicates
+num_rep: 1
+# Random seed
+random_seed: 1
