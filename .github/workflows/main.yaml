@@ -16,8 +16,13 @@ jobs:
   run-workflow:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v1
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@2.0.0
+
     - name: Test workflow (basic model)
       uses: snakemake/snakemake-github-action@v1.22.0
       with:
+        directory: .test
         snakefile: workflow/Snakefile
         args: "--configfile .test/config_basic/config.yaml --use-conda --show-failed-logs --cores 1 --conda-cleanup-pkgs cache"
