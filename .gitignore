@@ -1,7 +1,4 @@
-results/**
-data/**
-data/tmp**
-resources/**
-logs/**
+output
+output/**
 .snakemake
 .snakemake/**
