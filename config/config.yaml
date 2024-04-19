@@ -2,7 +2,7 @@
 L: 1000
 # Initial trait value
 z: 1
-# Genic variance per unit map length
+# Genetic variance per unit map length
 v: 1
 # Number of individuals per generation
 N: 1000
