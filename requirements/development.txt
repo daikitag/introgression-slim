@@ -3,6 +3,7 @@ numpy
 pandas
 pre-commit
 slim
+snakemake
 tqdm
 tskit
 tstrait
