@@ -21,4 +21,4 @@ jobs:
       with:
         directory: .test
         snakefile: workflow/Snakefile
-        args: "--configfile .test/config_basic/config.yaml --use-conda --show-failed-logs --cores 1 --conda-cleanup-pkgs cache"
+        args: "--configfile config_basic/config.yaml --use-conda --show-failed-logs --cores 1 --conda-cleanup-pkgs cache"
