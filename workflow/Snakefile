@@ -84,7 +84,7 @@ rule all:
 
 rule sim_slim:
     output:
-        "output/tmp/" + sim_results_pattern + ".trees",
+        f"output/tmp/" + sim_results_pattern + ".trees",
     conda:
         "envs/slim.yaml"
     shell:
@@ -112,7 +112,7 @@ rule process_tree:
 
 rule trait:
     input:
-        "output/tmp/" + sim_results_pattern + ".trees",
+        f"output/tmp/{sim_results_pattern}.trees",
     output:
         "output/tmp/" + sim_results_pattern + "_trait.csv",
     params:
@@ -130,6 +130,7 @@ rule plot_ibd:
         block_number="output/" + sim_results_pattern + "_block_number.png",
         block_length="output/" + sim_results_pattern + "_block_length.png",
         total_length="output/" + sim_results_pattern + "_total_length.png",
+        num_node="output/" + sim_results_pattern + "_num_chromosome.png",
     conda:
         "envs/analysis.yaml"
     script:
