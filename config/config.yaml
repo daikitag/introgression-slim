@@ -7,9 +7,9 @@ v: 1
 # Number of individuals per generation
 N: 1000
 # Recombination rate per site
-y: 1e-5
+y: 5e-5
 # Selection gradient
-beta: 0.1
+beta: 0.5
 # Number of generations in the simulation
 numGen: 100
 # Number of replicates
