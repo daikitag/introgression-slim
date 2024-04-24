@@ -12,7 +12,7 @@ The parameters of the simulation model can be set by manipulating the parameters
 $ git clone https://github.com/daikitag/introgression-slim.git
 ```
 
-2. Install `snakemake` by following the instructions written here: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html. If you have `coonda` installed on your computer, you can install `snakemake` by running:
+2. Install `snakemake` by following the instructions written here: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html. If you have `conda` installed on your computer, you can install `snakemake` by running:
 
 ```
 $ conda install -c bioconda snakemake
