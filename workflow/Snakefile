@@ -1,4 +1,5 @@
 import numpy as np
+import numbers
 
 
 configfile: "config/config.yaml"
@@ -14,19 +15,26 @@ numGens = config["numGen"]
 random_seed = config["random_seed"]
 num_rep = config["num_rep"]
 
-rng = np.random.default_rng(int(random_seed))
-seed_array = rng.choice(10 * num_rep, size=num_rep, replace=False)
+if isinstance(random_seed, numbers.Number):
+    seed = int(random_seed)
+else:
+    seed = None
 
-# Generate random seeds here based on number of replicates argument in config
-# config of random_seeds and num_replicates
-# Use random_seeds config to generate numpy random generator
+rng = np.random.default_rng(seed)
+seed_array = rng.choice(2**32 - 1, size=num_rep, replace=False)
+
+folder_pattern = (
+    "output/sim_L{L}_z{z}_v{v}_N{N}_y{y}_beta{beta}_numGen{numGen}_randomseed"
+    + str(random_seed)
+    + "/"
+)
 
 sim_results_pattern = (
     "sim_L{L}_z{z}_v{v}_N{N}_y{y}_beta{beta}_numGen{numGen}_seed{seed}"
 )
 
-sim_results_block_number = expand(
-    "output/" + sim_results_pattern + "_block_number.png",
+sim_results_plot = expand(
+    folder_pattern + sim_results_pattern + "_plot.png",
     L=Ls,
     z=zs,
     v=vs,
@@ -37,32 +45,8 @@ sim_results_block_number = expand(
     seed=seed_array,
 )
 
-sim_results_block_length = expand(
-    "output/" + sim_results_pattern + "_block_length.png",
-    L=Ls,
-    z=zs,
-    v=vs,
-    N=Ns,
-    y=ys,
-    beta=betas,
-    numGen=numGens,
-    seed=seed_array,
-)
-
-sim_results_total_length = expand(
-    "output/" + sim_results_pattern + "_total_length.png",
-    L=Ls,
-    z=zs,
-    v=vs,
-    N=Ns,
-    y=ys,
-    beta=betas,
-    numGen=numGens,
-    seed=seed_array,
-)
-
-sim_results_trait = expand(
-    "output/" + sim_results_pattern + "_average_trait.png",
+sim_results_slim = expand(
+    folder_pattern + sim_results_pattern + "_slim_simulation.txt",
     L=Ls,
     z=zs,
     v=vs,
@@ -76,15 +60,14 @@ sim_results_trait = expand(
 
 rule all:
     input:
-        sim_results_block_number,
-        sim_results_block_length,
-        sim_results_total_length,
-        sim_results_trait,
+        sim_results_plot,
+        sim_results_slim,
 
 
 rule sim_slim:
     output:
-        f"output/tmp/" + sim_results_pattern + ".trees",
+        tree_filename=f"output/tmp/{sim_results_pattern}.trees",
+        text_filename=f"{folder_pattern}{sim_results_pattern}_slim_simulation.txt",
     conda:
         "envs/slim.yaml"
     shell:
@@ -93,7 +76,8 @@ rule sim_slim:
             + "-d N={wildcards.N} -d y={wildcards.y} "
             + "-d beta={wildcards.beta} -d numGen={wildcards.numGen} "
             + "-d seed={wildcards.seed} "
-            + "-d 'filename=\"{output}\"' workflow/scripts/sim_introgression.slim"
+            + "-d 'tree_filename=\"{output.tree_filename}\"' "
+            + "-d 'text_filename=\"{output.text_filename}\"' workflow/scripts/sim_introgression.slim"
         )
 
 
@@ -123,26 +107,13 @@ rule trait:
         "scripts/trait.py"
 
 
-rule plot_ibd:
+rule plot_results:
     input:
-        "output/tmp/" + sim_results_pattern + "_ibd_segment.csv",
+        trait_df="output/tmp/" + sim_results_pattern + "_trait.csv",
+        ibd_df="output/tmp/" + sim_results_pattern + "_ibd_segment.csv",
     output:
-        block_number="output/" + sim_results_pattern + "_block_number.png",
-        block_length="output/" + sim_results_pattern + "_block_length.png",
-        total_length="output/" + sim_results_pattern + "_total_length.png",
-        num_node="output/" + sim_results_pattern + "_num_chromosome.png",
+        folder_pattern + sim_results_pattern + "_plot.png",
     conda:
         "envs/analysis.yaml"
     script:
-        "scripts/plot_block.py"
-
-
-rule plot_trait:
-    input:
-        "output/tmp/" + sim_results_pattern + "_trait.csv",
-    output:
-        "output/" + sim_results_pattern + "_average_trait.png",
-    conda:
-        "envs/analysis.yaml"
-    script:
-        "scripts/plot_trait.py"
+        "scripts/plot_results.py"

@@ -13,21 +13,34 @@ initialize() {
 	initializeGenomicElementType("g1", m1, 1.0);
 	m1.convertToSubstitution = F;
 	
-	initializeGenomicElement(g1, 0, L);
+	initializeGenomicElement(g1, 0, L-1);
 	initializeRecombinationRate(y);
 
 }
 // Set mutation effect of m1 as 1 (neutral), because we want
-// to manually determine the selection
+// to manually determine the selection. Taken from Section 13.2
+// of the SLiM manual to simulate quantitative traits.
 mutationEffect(m1) { return 1.0; }
 
 1 early() {
 	// create a population of N individuals
 	sim.addSubpop("p1", N);
+	// This will be used to count the number of replicates until
+	// the desired output
+	sim.setValue("num_rep", 1);
+}
+
+// Mutations must be set in late() event, because if it were in
+// an early() event, it would have no effect on the fitness values
+// for the first generation (p.176 of manual).
+1 late() {
+	// Save this simulation before setting the mutations to load this
+	// when we don't get the fixed mutation (Section 9.2 of manual)
+	sim.treeSeqOutput(tempdir() + "slim_" + seed + ".tree");
 	// add mutations to a single genome
-	genome = p1.individuals[0].genome1;
+	genome = sample(p1.genomes, 1);
 	for (k in seqLen(L)) {
-		sd = sqrt(v*y/L);
+		sd = sqrt(v/L);
 		S = rnorm(n=1, mean=z/L, sd=sd);
 		genome.addNewMutation(m1, selectionCoeff=S, position=k);
 	}
@@ -35,13 +48,43 @@ mutationEffect(m1) { return 1.0; }
 
 1: late() {
 	inds = p1.individuals;
+	// This fitness is taken from Section 13.2 of SLiM manual (p.253)
 	phenotypes = inds.sumOfMutationsOfType(m1);
 	inds.fitnessScaling = exp(beta * phenotypes);
+	// Save all individuals having the m1 mutation in the tree sequence
 	focal = (inds.countOfMutationsOfType(m1) > 0);
 	sim.treeSeqRememberIndividuals(inds[focal]);
+	// We restart the simulation when no individuals have m1 mutation
+	// late() ensures that we will stop the simulation when m1 mutation is lost
+	// This code is adapted from Section 9.2 of SLiM manual (p.177)
+	if (sim.countOfMutationsOfType(m1) == 0)
+	{
+		cat("SLiM simulation restarting\n");
+		// Add 1 to num_rep, as we are conducting a new replicate
+		sim.setValue("num_rep", sim.getValue("num_rep") + 1);
+		// Start from tick 1
+		sim.readFromPopulationFile(tempdir() + "slim_" + seed + ".tree");
+		// Start a newly seeded run. This will be controlled by the initial
+		// seed, as rdunif is called by using the current seed.
+		setSeed(rdunif(1, 0, asInteger(2^62) - 1));
+		// re-introduce mutations
+		genome = sample(p1.genomes, 1);
+		for (k in seqLen(L)) {
+			sd = sqrt(v/L);
+			S = rnorm(n=1, mean=z/L, sd=sd);
+			genome.addNewMutation(m1, selectionCoeff=S, position=k);
+		}
+	}
 }
 
-// Record for numGen generations
+// Record after numGen generations
 numGen late() {
-	sim.treeSeqOutput(filename);
+	writeFile(
+		text_filename,
+		paste("Number of replicates:",
+		sim.getValue("num_rep"),
+		", Final seed used:",
+		getSeed())
+		);
+	sim.treeSeqOutput(tree_filename);
 }
