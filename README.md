@@ -29,7 +29,12 @@ Here, `--cores` command specifies the number of cores to use and `--use-conda` a
 
 ## Output:
 
-The output plots of the simulation will be generated in `output` folder. The parameters of the simulation are indicated in the file name.
+There will be two outputs of the simulation, and they will be located in `output` folder. The parameters of the simulation are indicated in the file name.
+
+- Output plot indicating the summary statistics of the genomic blocks that are inherited form the focal individual. These plots are only obtained when the mutations do not die out in the simulation.
+- Text file indicating the number of replicates that SLiM had to do to ensure a simulation output without mutations dying out, and the final seed that is used by SLiM to obtain the desired simulation.
+
+The simulation outputs are only obtained when there are some individuals inheriting the genomic block from the focal individual at the final generation. When all individuals that inherit the block dies out in the forward-time simulation, the SLiM forward-time genetic simulation is terminated and conducted again by using a different random seed that is generated randomly by using the input `random_seed`.
 
 ## Note:
 
@@ -39,14 +44,13 @@ Running this simulation code for the first time will require a lot of time, as i
 
 The mathematical details of the simulation model is described in [Sachdeva and Barton (2018)](https://doi.org/10.1534/genetics.118.301018) as "individual-based simulation" (See section named "Individual-based simulations of long-term introgression into a finite population" in the paper for the details of the simulation). In particular, we simulate introgression based on the following assumptions:
 
-- Discrete Wright-Fisher model
+- Discrete Wright-Fisher model with **diploid** individuals
 - Fitness is defined in the "Individual-based simulations of long-term introgression into a finite population" section
 - Effect sizes of each mutation are sampled from $N(z/L, \sqrt{vy/L})$, where $z$ is the initial trait value, $L$ is the length of the chromosome, and $v$ is genetic variance per unit map length. While the initial trait value will not be exactly $z$, users can set the chromosome length as any integer in this setting.
 - Recombination rate is set as rate/site, instead of rate/individual in [Sachdeva and Barton (2018)](https://doi.org/10.1534/genetics.118.301018). It would be possible for the simulation to have multiple recombination breakpoints.
 - Discrete loci (Recombination breakpoints will be an integer)
 - Zero mutation rate, and all mutations descend from the single individual at the first generation
 
-The output plots are obtained by calculating the summary statistics of the IBD segments that are descended from the individual carrying the mutation at the beginning of the simulation.
 
 # References:
 
