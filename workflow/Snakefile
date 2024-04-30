@@ -34,7 +34,7 @@ sim_results_pattern = (
 )
 
 sim_results_plot = expand(
-    folder_pattern + sim_results_pattern + "_plot.png",
+    f"{folder_pattern}{sim_results_pattern}_plot.png",
     L=Ls,
     z=zs,
     v=vs,
@@ -46,7 +46,7 @@ sim_results_plot = expand(
 )
 
 sim_results_slim = expand(
-    folder_pattern + sim_results_pattern + "_slim_simulation.txt",
+    f"{folder_pattern}{sim_results_pattern} _slim_simulation.txt",
     L=Ls,
     z=zs,
     v=vs,
@@ -68,6 +68,8 @@ rule sim_slim:
     output:
         tree_filename=f"output/tmp/{sim_results_pattern}.trees",
         text_filename=f"{folder_pattern}{sim_results_pattern}_slim_simulation.txt",
+    log:
+        f"logs/slim/{sim_results_pattern}.log",
     conda:
         "envs/slim.yaml"
     shell:
@@ -83,9 +85,11 @@ rule sim_slim:
 
 rule process_tree:
     input:
-        "output/tmp/" + sim_results_pattern + ".trees",
+        f"output/tmp/{sim_results_pattern}.trees",
     output:
-        "output/tmp/" + sim_results_pattern + "_ibd_segment.csv",
+        f"output/tmp/{sim_results_pattern}_ibd_segment.csv",
+    log:
+        f"logs/process_tree/{sim_results_pattern}.log",
     params:
         N=lambda wildcards: wildcards.N,
     conda:
@@ -98,7 +102,9 @@ rule trait:
     input:
         f"output/tmp/{sim_results_pattern}.trees",
     output:
-        "output/tmp/" + sim_results_pattern + "_trait.csv",
+        f"output/tmp/{sim_results_pattern}_trait.csv",
+    log:
+        f"logs/trait/{sim_results_pattern}.log",
     params:
         N=lambda wildcards: wildcards.N,
     conda:
@@ -109,10 +115,12 @@ rule trait:
 
 rule plot_results:
     input:
-        trait_df="output/tmp/" + sim_results_pattern + "_trait.csv",
-        ibd_df="output/tmp/" + sim_results_pattern + "_ibd_segment.csv",
+        trait_df=f"output/tmp/{sim_results_pattern}_trait.csv",
+        ibd_df=f"output/tmp/{sim_results_pattern}_ibd_segment.csv",
     output:
-        folder_pattern + sim_results_pattern + "_plot.png",
+        f"{folder_pattern}{sim_results_pattern}_plot.png",
+    log:
+        f"logs/plot/{sim_results_pattern}.log",
     conda:
         "envs/analysis.yaml"
     script:

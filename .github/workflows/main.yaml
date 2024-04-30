@@ -13,12 +13,18 @@ jobs:
     - uses: actions/setup-python@v3
     - uses: pre-commit/action@v3.0.1
 
-  integration:
-    name: Full pipeline
+  snakemake:
+    name: Full Snakemake pipeline
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v3
+    - name: Linting
+      uses: snakemake/snakemake-github-action@v1
+      with:
+        directory: '.'
+        snakefile: workflow/Snakefile
+        args: '--configfile .test/config_basic/config.yaml --lint'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -28,10 +34,10 @@ jobs:
       with:
         directory: '.'
         snakefile: 'workflow/Snakefile'
-        args: '--configfile .test/config_basic/config.yaml --cores 2 --use-conda --conda-cleanup-pkgs cache'
+        args: '--configfile .test/config_basic/config.yaml --cores 2 --use-conda --conda-cleanup-pkgs cache --show-failed-log'
     - name: Test report (with low selection coefficient)
       uses: snakemake/snakemake-github-action@v1
       with:
         directory: '.'
         snakefile: 'workflow/Snakefile'
-        args: '--configfile .test/config_low_selection/config.yaml --cores 2 --use-conda --conda-cleanup-pkgs cache'
+        args: '--configfile .test/config_low_selection/config.yaml --cores 2 --use-conda --conda-cleanup-pkgs cache --show-failed-log'

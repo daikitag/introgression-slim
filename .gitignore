@@ -4,3 +4,4 @@ output
 output/**
 .snakemake
 .snakemake/**
+logs/**

@@ -15,4 +15,4 @@ numGen: 100
 # Number of replicates
 num_rep: 1
 # Random seed
-random_seed: 1
+random_seed: 10000
