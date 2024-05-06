@@ -1,8 +1,12 @@
 import numpy as np
 import numbers
+from snakemake.utils import validate
 
 
 configfile: "config/config.yaml"
+
+
+validate(config, schema="schemas/config.schema.yaml")
 
 
 Ls = config["L"]

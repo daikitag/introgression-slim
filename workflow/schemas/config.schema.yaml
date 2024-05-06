@@ -1,0 +1,41 @@
+$schema: "http://json-schema.org/draft-06/schema#"
+
+description: snakemake configuration file
+
+properties:
+  L:
+    type: integer
+    description: Length of chromosome
+  z:
+    type: number
+    description: Initial trait value
+  v:
+    type: number
+    description: Genetic variance per unit map length
+  N:
+    type: integer
+    description: Number of individuals per generation
+  y:
+    description: Recombination rate per site
+  beta:
+    type: number
+    description: Selection gradient
+  numGen:
+    type: integer
+    description: Number of generations in the simulation
+  num_rep:
+    type: integer
+    description: Number of replicates
+  random_seed:
+    description: Random seed
+
+required:
+  - L
+  - z
+  - v
+  - N
+  - y
+  - beta
+  - numGen
+  - num_rep
+  - random_seed
